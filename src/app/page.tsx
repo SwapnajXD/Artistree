@@ -22,7 +22,7 @@ const tools = [
     description: "Video art effects implemented based on blob tracking algorithm, with many rich customization options.",
     badges: ["Video"],
     image: "https://assets.artistree.cc/cover/baby-track.jpeg",
-    popular: true,
+    underConstruction: true,
   },
   {
     id: "tonekit",
@@ -30,13 +30,14 @@ const tools = [
     description: "Retro halftone effect generator, creating vintage dot-matrix patterns and screen printing aesthetics with customizable density and angles.",
     badges: ["Video", "Image"],
     image: "https://assets.artistree.cc/cover/tonekit.jpeg?t=1",
+    underConstruction: true,
   },
   {
     id: "trigger-wave",
     name: "TriggerWave",
     description: "Beat-synced visual effects that react to music in real time. Upload audio, detect beats, and export with audio.",
     badges: ["Video"],
-    experimental: true,
+    underConstruction: true,
     image: "https://assets.artistree.cc/cover/trigger-wave.jpeg",
   },
   {
@@ -45,6 +46,7 @@ const tools = [
     description: "Convert images into ASCII art with customizable character sets, fonts, and visual parameters for retro-style text representations.",
     badges: ["Video", "Image"],
     image: "https://assets.artistree.cc/cover/asciikit.jpeg",
+    underConstruction: true,
   },
   {
     id: "retroman",
@@ -52,6 +54,7 @@ const tools = [
     description: "One-click generation of pixel dithering textures that inject retro noise into images, perfect for creating high-quality retro pixel art and dithering effects.",
     badges: ["Image"],
     image: "https://assets.artistree.cc/cover/retro-man.jpeg",
+    underConstruction: true,
   },
   {
     id: "glassify",
@@ -59,6 +62,7 @@ const tools = [
     description: "Transform images into glass-like viewing effects by simulating light refraction and distortion, as if viewing through textured glass surfaces.",
     badges: ["Video", "Image"],
     image: "https://assets.artistree.cc/cover/cut-it.jpeg",
+    underConstruction: true,
   },
   {
     id: "blur-suite",
@@ -66,6 +70,7 @@ const tools = [
     description: "Multiple blur modes (linear, radial, zoom, wave) for creating motion blur effects on images and videos.",
     badges: ["Video", "Image"],
     image: "https://assets.artistree.cc/cover/blursuite.jpeg",
+    underConstruction: true,
   },
   {
     id: "super-g",
@@ -73,6 +78,7 @@ const tools = [
     description: "Super-G is a tool focused on creating glitch aesthetics, allowing you to easily generate unique glitch effects.",
     badges: ["Video", "Image"],
     image: "https://assets.artistree.cc/cover/superg.jpeg",
+    underConstruction: true,
   },
   {
     id: "scanline",
@@ -80,6 +86,7 @@ const tools = [
     description: "Add analog CRT, VHS glitch, and digital block corruption effects to your images and videos in real time.",
     badges: ["Video", "Image"],
     image: "https://assets.artistree.cc/cover/scanline.jpeg",
+    underConstruction: true,
   },
   {
     id: "image-track",
@@ -87,6 +94,7 @@ const tools = [
     description: "Image version of BabyTrack, applying blob tracking algorithms to static images for artistic visual effects and pattern generation.",
     badges: ["Image"],
     image: "https://assets.artistree.cc/cover/image-track.jpeg",
+    underConstruction: true,
   },
   {
     id: "recolor",
@@ -94,13 +102,14 @@ const tools = [
     description: "Remap the colors of your images and videos using hue mapping and animation controls.",
     badges: ["Video", "Image"],
     image: "https://assets.artistree.cc/cover/recolor2.jpeg",
+    underConstruction: true,
   },
   {
     id: "loop-flow",
     name: "LoopFlow",
     description: "Create psychedelic Droste effects on your images and videos.",
     badges: ["Video"],
-    experimental: true,
+    underConstruction: true,
     image: "https://assets.artistree.cc/cover/loop-flow.jpeg",
   },
 ];
@@ -285,15 +294,9 @@ export default function Home() {
                             className="pointer-events-none absolute inset-0"
                             style={{ background: "radial-gradient(transparent 40%, rgba(0, 0, 0, 0.3) 100%)" }}
                           />
-                          {tool.popular && (
-                            <span className="absolute top-3 right-3 z-10 flex items-center space-x-1 rounded-full bg-green-300/80 px-2.5 py-0.5 text-xs font-semibold text-black backdrop-blur-3xl">
-                              <span>★</span>
-                              <span>Most Popular</span>
-                            </span>
-                          )}
-                          {tool.experimental && (
-                            <span className="absolute top-3 right-3 z-10 flex items-center space-x-1 rounded-full bg-orange-300/80 px-2.5 py-0.5 text-xs font-semibold text-black backdrop-blur-3xl">
-                              <span>Experimental</span>
+                          {tool.underConstruction && (
+                            <span className="absolute top-3 right-3 z-10 flex items-center space-x-1 rounded-full bg-yellow-300/80 px-2.5 py-0.5 text-xs font-semibold text-black backdrop-blur-3xl">
+                              <span>Under Construction</span>
                             </span>
                           )}
                         </div>
@@ -331,15 +334,9 @@ export default function Home() {
                             className="h-full w-full object-cover grayscale transition-all duration-500 group-hover:scale-102 group-hover:grayscale-0"
                             src={tool.image}
                           />
-                          {tool.popular && (
-                            <span className="absolute top-3 right-3 z-10 flex items-center space-x-1 rounded-full bg-green-300/80 px-2.5 py-0.5 text-xs font-semibold text-black backdrop-blur-3xl">
-                              <span>★</span>
-                              <span>Most Popular</span>
-                            </span>
-                          )}
-                          {tool.experimental && (
-                            <span className="absolute top-3 right-3 z-10 flex items-center space-x-1 rounded-full bg-orange-300/80 px-2.5 py-0.5 text-xs font-semibold text-black backdrop-blur-3xl">
-                              <span>Experimental</span>
+                          {tool.underConstruction && (
+                            <span className="absolute top-3 right-3 z-10 flex items-center space-x-1 rounded-full bg-yellow-300/80 px-2.5 py-0.5 text-xs font-semibold text-black backdrop-blur-3xl">
+                              <span>Under Construction</span>
                             </span>
                           )}
                         </div>
@@ -377,15 +374,9 @@ export default function Home() {
                             className="h-full w-full object-cover grayscale transition-all duration-500 group-hover:scale-102 group-hover:grayscale-0"
                             src={tool.image}
                           />
-                          {tool.popular && (
-                            <span className="absolute top-3 right-3 z-10 flex items-center space-x-1 rounded-full bg-green-300/80 px-2.5 py-0.5 text-xs font-semibold text-black backdrop-blur-3xl">
-                              <span>★</span>
-                              <span>Most Popular</span>
-                            </span>
-                          )}
-                          {tool.experimental && (
-                            <span className="absolute top-3 right-3 z-10 flex items-center space-x-1 rounded-full bg-orange-300/80 px-2.5 py-0.5 text-xs font-semibold text-black backdrop-blur-3xl">
-                              <span>Experimental</span>
+                          {tool.underConstruction && (
+                            <span className="absolute top-3 right-3 z-10 flex items-center space-x-1 rounded-full bg-yellow-300/80 px-2.5 py-0.5 text-xs font-semibold text-black backdrop-blur-3xl">
+                              <span>Under Construction</span>
                             </span>
                           )}
                         </div>

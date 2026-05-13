@@ -294,7 +294,7 @@ export default function ToolPage({ params }: { params: Promise<{ id: string }> }
               <p className="text-muted-foreground mb-6">
                 This tool is under development. Stay tuned for updates!
               </p>
-              <Button asChild>
+              <Button>
                 <Link href="/">
                   Explore Other Tools
                 </Link>
