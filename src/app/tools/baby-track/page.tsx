@@ -53,9 +53,10 @@ function ToolSidebar({
   };
 
   const toggleFilter = (filter: string) => {
-    setSelectedFilters(prev =>
-      prev.includes(filter) ? prev.filter(f => f !== filter) : [...prev, filter]
-    );
+    const newFilters = selectedFilters.includes(filter)
+      ? selectedFilters.filter(f => f !== filter)
+      : [...selectedFilters, filter];
+    setSelectedFilters(newFilters);
   };
 
   const handleShapeChange = (value: string | null) => { if (value) setShape(value); };
@@ -356,8 +357,8 @@ export default function BabyTrackPage() {
               )}
               <label className="cursor-pointer">
                 <input type="file" accept={mediaType === "video" ? "video/*" : "image/*"} onChange={handleFileUpload} className="hidden" />
-                <Button variant="secondary" size="sm" asChild>
-                  <span>Replace</span>
+                <Button variant="secondary" size="sm">
+                  Replace
                 </Button>
               </label>
             </div>
