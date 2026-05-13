@@ -7,13 +7,6 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   LayoutDashboard,
-  Newspaper,
-  School,
-  CreditCard,
-  Info,
-  ShieldCheck,
-  MessageSquare,
-  CircleHelp,
   Sun,
   Moon,
   Menu,
@@ -111,16 +104,6 @@ const tools = [
 
 const navItems = [
   { name: "Explore", icon: LayoutDashboard, href: "#explore", active: true },
-  { name: "Articles", icon: Newspaper, href: "#", soon: true },
-  { name: "Tutorials", icon: School, href: "#", soon: true },
-  { name: "Pricing", icon: CreditCard, href: "#pricing" },
-];
-
-const footerItems = [
-  { name: "About", icon: Info, href: "#about" },
-  { name: "Privacy", icon: ShieldCheck, href: "#privacy" },
-  { name: "Contact", icon: MessageSquare, href: "#contact" },
-  { name: "FAQ", icon: CircleHelp, href: "#faq" },
 ];
 
 function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
@@ -180,20 +163,7 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
       </div>
 
       <div className="flex flex-col gap-2 border-t p-2">
-        <nav className="flex w-full min-w-0 flex-col gap-1">
-          {footerItems.map((item) => (
-            <a
-              key={item.name}
-              href={item.href}
-              onClick={onItemClick}
-              className="flex w-full items-center gap-2 justify-start h-9 px-2 rounded-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-            >
-              <item.icon className="size-6" />
-              <span>{item.name}</span>
-            </a>
-          ))}
-        </nav>
-        <div className="flex items-center justify-between border-t px-2 py-2">
+        <div className="flex items-center justify-between px-2 py-2">
           <div className="flex items-center space-x-3 text-sm text-muted-foreground">
             <span>Socials</span>
           </div>
