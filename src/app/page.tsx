@@ -12,6 +12,7 @@ import {
   Sun,
   Moon,
   Menu,
+  User,
 } from "lucide-react";
 
 const tools = [
@@ -112,6 +113,12 @@ const footerItems = [
   { name: "About", icon: Info, href: "#about" },
 ];
 
+const socials = [
+  { name: "Threads", url: "#" },
+  { name: "Instagram", url: "#" },
+  { name: "X", url: "#" },
+];
+
 function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
@@ -121,86 +128,92 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
   };
 
   return (
-    <>
+    <div className="flex h-full w-full flex-col bg-sidebar">
+      {/* Header */}
       <div className="flex flex-col gap-2 p-2">
-        <div className="mb-1 flex h-9 items-center justify-between px-2 py-1">
-          <div className="grid flex-1 text-left text-3xl leading-tight">
-            <span className="font-bold uppercase">ARTISTREE</span>
+        <div className="mb-1 h-9 p-2 py-1">
+          <div className="flex w-full items-center justify-between">
+            <div className="flex items-center">
+              <div className="grid flex-1 text-left text-3xl leading-tight">
+                <span className="font-bold uppercase text-sidebar-foreground">ARTISTREE</span>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="h-[24px] w-[24px] rounded-full border border-input bg-card shadow-xs hover:bg-accent hover:text-accent-foreground"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-3 w-3 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              ) : (
+                <Moon className="absolute h-3 w-3 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              )}
+              <span className="sr-only">Toggle theme</span>
+            </Button>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            className="h-[24px] w-[24px]"
-          >
-            {theme === "dark" ? (
-              <Sun className="h-3 w-3 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            ) : (
-              <Moon className="absolute h-3 w-3 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            )}
-            <span className="sr-only">Toggle theme</span>
-          </Button>
         </div>
       </div>
 
+      {/* Content */}
       <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto px-2">
         <nav className="flex w-full min-w-0 flex-col gap-1">
           {navItems.map((item) => (
-            <a
+            <Button
               key={item.name}
-              href={item.href}
+              variant={item.active ? "secondary" : "ghost"}
+              className="flex w-full items-center gap-2 justify-start h-9 px-2 text-sm"
               onClick={onItemClick}
-              className={`flex w-full items-center gap-2 justify-start h-9 px-2 rounded-sm transition-colors ${
-                item.active
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                  : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-              }`}
             >
               <item.icon className="size-6" />
               <span>{item.name}</span>
-            </a>
+            </Button>
           ))}
         </nav>
       </div>
 
+      {/* Footer */}
       <div className="flex flex-col gap-2 border-t p-2">
         <nav className="flex w-full min-w-0 flex-col gap-1">
           {footerItems.map((item) => (
-            <a
+            <Button
               key={item.name}
-              href={item.href}
+              variant="ghost"
+              className="flex w-full items-center gap-2 justify-start h-9 px-2 text-sm"
               onClick={onItemClick}
-              className="flex w-full items-center gap-2 justify-start h-9 px-2 rounded-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             >
               <item.icon className="size-6" />
               <span>{item.name}</span>
-            </a>
+            </Button>
           ))}
         </nav>
-        <div className="flex items-center justify-between px-2 py-2">
+        <div className="flex items-center justify-between pl-2">
           <div className="flex items-center space-x-3 text-sm text-muted-foreground">
             <span>Socials</span>
           </div>
           <div className="flex space-x-2">
-            {["T", "I", "X"].map((s, i) => (
+            {socials.map((social, i) => (
               <a
                 key={i}
-                href="#"
+                href={social.url}
                 className="flex aspect-square h-6 items-center justify-center rounded-sm opacity-50 transition-opacity hover:opacity-100"
+                title={social.name}
               >
-                <span className="text-xs">{s}</span>
+                <span className="text-xs text-sidebar-foreground">{social.name[0]}</span>
               </a>
             ))}
           </div>
         </div>
-        <a
-          href="#"
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-muted"
-        >
-          <span className="text-sm font-medium">Login</span>
-        </a>
+        <Button variant="ghost" className="w-full justify-start h-auto" asChild={false}>
+          <a href="#" className="flex items-center space-x-2 p-1 rounded-lg hover:bg-muted w-full justify-start">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+              <User className="h-4 w-4" />
+            </div>
+            <span className="text-sm font-medium">Login</span>
+          </a>
+        </Button>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -211,7 +224,7 @@ export default function Home() {
     <div className="flex min-h-screen w-full">
       {/* Desktop Sidebar */}
       <div className="hidden md:flex">
-        <div className="flex h-svh w-[16rem] flex-col bg-sidebar text-sidebar-foreground border-r">
+        <div className="flex h-svh w-[16rem] flex-col border-r">
           <SidebarContent />
         </div>
       </div>
@@ -223,7 +236,7 @@ export default function Home() {
             className="fixed inset-0 bg-black/50"
             onClick={() => setSidebarOpen(false)}
           />
-          <div className="fixed left-0 top-0 z-50 flex h-svh w-[16rem] flex-col bg-sidebar text-sidebar-foreground border-r">
+          <div className="fixed left-0 top-0 z-50 flex h-svh w-[16rem] flex-col border-r">
             <SidebarContent onItemClick={() => setSidebarOpen(false)} />
           </div>
         </div>
@@ -286,22 +299,22 @@ export default function Home() {
                         </div>
                       </Link>
                       <CardHeader>
-                          <div className="flex items-center justify-between">
-                            <CardTitle className="text-xl">{tool.name}</CardTitle>
-                            <div className="flex flex-wrap gap-2">
-                              {tool.badges.map((badge) => (
-                                <Badge key={badge} variant="secondary">{badge}</Badge>
-                              ))}
-                            </div>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-xl">{tool.name}</CardTitle>
+                          <div className="flex flex-wrap gap-2">
+                            {tool.badges.map((badge) => (
+                              <Badge key={badge} variant="secondary">{badge}</Badge>
+                            ))}
                           </div>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="line-clamp-2 text-sm text-muted-foreground">{tool.description}</p>
-                        </CardContent>
-                        <CardFooter className="flex items-center justify-between border-t">
-                          <span className="text-sm font-medium">Try it now</span>
-                          <span className="transition-transform group-hover:translate-x-1">→</span>
-                        </CardFooter>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="line-clamp-2 text-sm text-muted-foreground">{tool.description}</p>
+                      </CardContent>
+                      <CardFooter className="flex items-center justify-between border-t">
+                        <span className="text-sm font-medium">Try it now</span>
+                        <span className="transition-transform group-hover:translate-x-1">→</span>
+                      </CardFooter>
                     </Card>
                   ))}
                 </div>
@@ -332,22 +345,22 @@ export default function Home() {
                         </div>
                       </Link>
                       <CardHeader>
-                          <div className="flex items-center justify-between">
-                            <CardTitle className="text-xl">{tool.name}</CardTitle>
-                            <div className="flex flex-wrap gap-2">
-                              {tool.badges.map((badge) => (
-                                <Badge key={badge} variant="secondary">{badge}</Badge>
-                              ))}
-                            </div>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-xl">{tool.name}</CardTitle>
+                          <div className="flex flex-wrap gap-2">
+                            {tool.badges.map((badge) => (
+                              <Badge key={badge} variant="secondary">{badge}</Badge>
+                            ))}
                           </div>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="line-clamp-2 text-sm text-muted-foreground">{tool.description}</p>
-                        </CardContent>
-                        <CardFooter className="flex items-center justify-between border-t">
-                          <span className="text-sm font-medium">Try it now</span>
-                          <span className="transition-transform group-hover:translate-x-1">→</span>
-                        </CardFooter>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="line-clamp-2 text-sm text-muted-foreground">{tool.description}</p>
+                      </CardContent>
+                      <CardFooter className="flex items-center justify-between border-t">
+                        <span className="text-sm font-medium">Try it now</span>
+                        <span className="transition-transform group-hover:translate-x-1">→</span>
+                      </CardFooter>
                     </Card>
                   ))}
                 </div>
@@ -378,22 +391,22 @@ export default function Home() {
                         </div>
                       </Link>
                       <CardHeader>
-                          <div className="flex items-center justify-between">
-                            <CardTitle className="text-xl">{tool.name}</CardTitle>
-                            <div className="flex flex-wrap gap-2">
-                              {tool.badges.map((badge) => (
-                                <Badge key={badge} variant="secondary">{badge}</Badge>
-                              ))}
-                            </div>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-xl">{tool.name}</CardTitle>
+                          <div className="flex flex-wrap gap-2">
+                            {tool.badges.map((badge) => (
+                              <Badge key={badge} variant="secondary">{badge}</Badge>
+                            ))}
                           </div>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="line-clamp-2 text-sm text-muted-foreground">{tool.description}</p>
-                        </CardContent>
-                        <CardFooter className="flex items-center justify-between border-t">
-                          <span className="text-sm font-medium">Try it now</span>
-                          <span className="transition-transform group-hover:translate-x-1">→</span>
-                        </CardFooter>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="line-clamp-2 text-sm text-muted-foreground">{tool.description}</p>
+                      </CardContent>
+                      <CardFooter className="flex items-center justify-between border-t">
+                        <span className="text-sm font-medium">Try it now</span>
+                        <span className="transition-transform group-hover:translate-x-1">→</span>
+                      </CardFooter>
                     </Card>
                   ))}
                 </div>
