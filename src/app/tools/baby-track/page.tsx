@@ -8,7 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { LayoutDashboard, Info, Sun, Moon, User, Upload, Video, Image, Download, ArrowLeft, Home } from "lucide-react";
+import { Sun, Moon, User, Upload, Video, Image, Download, ArrowLeft, Home, Loader2 } from "lucide-react";
+
+const API_URL = "http://localhost:8000";
 
 function ToolSidebar({
   onClose,
@@ -236,10 +238,51 @@ export default function BabyTrackPage() {
   const [fontSize, setFontSize] = useState("16px");
 
   const [mediaUrl, setMediaUrl] = useState<string | null>(null);
+  const [processedUrl, setProcessedUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [processError, setProcessError] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const processMedia = async () => {
+    if (!mediaUrl || isProcessing) return;
+
+    setIsProcessing(true);
+    setProcessError(null);
+
+    try {
+      const isVideo = mediaType === "video";
+      const response = await fetch(`${API_URL}/api/tools/baby-track/process`, {
+        method: "POST",
+        headers: {
+          "Accept": isVideo ? "video/mp4" : "image/jpeg",
+        },
+        body: createFormData(),
+      });
+
+      if (!response.ok) {
+        throw new Error("Processing failed");
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      setProcessedUrl(url);
+    } catch (error) {
+      console.error("Processing error:", error);
+      setProcessError("Failed to process. Make sure the server is running.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const createFormData = () => {
+    const formData = new FormData();
+    if (mediaUrl) {
+      const response = fetch(mediaUrl).then(res => res.blob());
+    }
+    return formData;
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
