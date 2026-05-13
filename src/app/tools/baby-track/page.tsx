@@ -24,6 +24,7 @@ function ToolSidebar({
   selectedFilters, setSelectedFilters,
   textPosition, setTextPosition,
   fontSize, setFontSize,
+  processedUrl, onClearMedia,
 }: {
   onClose?: () => void;
   mediaType: "video" | "image";
@@ -46,6 +47,8 @@ function ToolSidebar({
   setTextPosition: (v: string) => void;
   fontSize: string;
   setFontSize: (v: string) => void;
+  processedUrl: string | null;
+  onClearMedia: () => void;
 }) {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
@@ -211,14 +214,29 @@ function ToolSidebar({
 
       {/* Export */}
       <div className="p-2 border-t space-y-2">
-        <Button className="w-full" disabled><Download className="size-4 mr-2" /> Export MP4</Button>
-        <Button variant="outline" className="w-full" disabled><Download className="size-4 mr-2" /> Export WebM</Button>
+        <Button
+          className="w-full"
+          disabled={!processedUrl}
+          onClick={() => {
+            if (processedUrl) {
+              const a = document.createElement("a");
+              a.href = processedUrl;
+              a.download = "processed.mp4";
+              a.click();
+            }
+          }}
+        >
+          <Download className="size-4 mr-2" /> Export MP4
+        </Button>
+        <Button variant="outline" className="w-full" disabled={!processedUrl}>
+          <Download className="size-4 mr-2" /> Export WebM
+        </Button>
       </div>
 
       {/* Footer */}
       <div className="p-2 border-t">
-        <Button variant="ghost" className="w-full justify-start">
-          <User className="size-4 mr-2" /> Login
+        <Button variant="ghost" className="w-full justify-start" onClick={onClearMedia}>
+          <ArrowLeft className="size-4 mr-2" /> {processedUrl ? "Back to Original" : "Back to Home"}
         </Button>
       </div>
     </div>
@@ -242,23 +260,49 @@ export default function BabyTrackPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processError, setProcessError] = useState<string | null>(null);
+  const [serverStatus, setServerStatus] = useState<"checking" | "ok" | "error">("checking");
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Check server status on mount
+  useEffect(() => {
+    fetch(`${API_URL}/health`)
+      .then(() => setServerStatus("ok"))
+      .catch(() => setServerStatus("error"));
+  }, []);
 
   const processMedia = async () => {
     if (!mediaUrl || isProcessing) return;
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = fileInput?.files?.[0];
+    if (!file) return;
 
     setIsProcessing(true);
     setProcessError(null);
 
     try {
-      const isVideo = mediaType === "video";
-      const response = await fetch(`${API_URL}/api/tools/baby-track/process`, {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("shape", shape);
+      formData.append("region_style", regionStyle);
+      formData.append("connection_rate", String(connectionRate));
+      formData.append("stroke_width", String(strokeWidth));
+      formData.append("blob_count", String(blobCount));
+      formData.append("text_position", textPosition);
+      formData.append("font_size", parseInt(fontSize));
+      formData.append("filters", selectedFilters.join(","));
+      formData.append("min_area", "100");
+      formData.append("max_blobs", "500");
+
+      const endpoint = mediaType === "video"
+        ? "/api/tools/baby-track/process"
+        : "/api/tools/baby-track/process-frame";
+
+      const response = await fetch(`${API_URL}${endpoint}`, {
         method: "POST",
-        headers: {
-          "Accept": isVideo ? "video/mp4" : "image/jpeg",
-        },
-        body: createFormData(),
+        body: formData,
       });
 
       if (!response.ok) {
@@ -270,18 +314,10 @@ export default function BabyTrackPage() {
       setProcessedUrl(url);
     } catch (error) {
       console.error("Processing error:", error);
-      setProcessError("Failed to process. Make sure the server is running.");
+      setProcessError("Failed to process. Make sure the server is running at localhost:8000");
     } finally {
       setIsProcessing(false);
     }
-  };
-
-  const createFormData = () => {
-    const formData = new FormData();
-    if (mediaUrl) {
-      const response = fetch(mediaUrl).then(res => res.blob());
-    }
-    return formData;
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -343,6 +379,8 @@ export default function BabyTrackPage() {
           setTextPosition={setTextPosition}
           fontSize={fontSize}
           setFontSize={setFontSize}
+          processedUrl={processedUrl}
+          onClearMedia={() => { setMediaUrl(null); setProcessedUrl(null); setIsPlaying(false); }}
         />
       </div>
 
@@ -354,7 +392,25 @@ export default function BabyTrackPage() {
           onDrop={handleDrop}
           onDragOver={handleDragOver}
         >
-          {mediaUrl ? (
+          {processedUrl ? (
+            mediaType === "video" ? (
+              <video
+                ref={videoRef}
+                src={processedUrl}
+                className="w-full h-full object-contain"
+                onClick={() => setIsPlaying(!isPlaying)}
+                playsInline
+                controls
+                autoPlay
+              />
+            ) : (
+              <img
+                src={processedUrl}
+                alt="Processed"
+                className="w-full h-full object-contain"
+              />
+            )
+          ) : mediaUrl ? (
             mediaType === "video" ? (
               <video
                 ref={videoRef}
@@ -375,37 +431,70 @@ export default function BabyTrackPage() {
               <Upload className="w-16 h-16 mb-4 opacity-50" />
               <p className="text-lg font-medium">Upload {mediaType === "video" ? "Video" : "Image"}</p>
               <p className="text-sm">Drag and drop or click to upload</p>
-              <label className="mt-4 cursor-pointer">
-                <input type="file" accept={mediaType === "video" ? "video/*" : "image/*"} onChange={handleFileUpload} className="hidden" />
-                <Button>
-                  <Upload className="size-4 mr-2" /> Choose File
-                </Button>
-              </label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept={mediaType === "video" ? "video/*" : "image/*"}
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              <Button className="mt-4" onClick={() => fileInputRef.current?.click()}>
+                <Upload className="size-4 mr-2" /> Choose File
+              </Button>
             </div>
           )}
 
           {/* Overlay controls */}
           {mediaUrl && (
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={processMedia}
+                disabled={isProcessing}
+              >
+                {isProcessing ? (
+                  <>
+                    <Loader2 className="size-4 mr-1 animate-spin" /> Processing...
+                  </>
+                ) : (
+                  <>
+                    <Video className="size-4 mr-1" /> Process
+                  </>
+                )}
+              </Button>
               <Button variant="secondary" size="sm" onClick={() => {
                 setMediaUrl(null);
+                setProcessedUrl(null);
                 setIsPlaying(false);
               }}>
                 Clear
               </Button>
-              {mediaType === "video" && (
+              {mediaType === "video" && !processedUrl && (
                 <Button variant="secondary" size="sm" onClick={() => setIsPlaying(!isPlaying)}>
                   {isPlaying ? "Pause" : "Play"}
                 </Button>
               )}
-              <label className="cursor-pointer">
-                <input type="file" accept={mediaType === "video" ? "video/*" : "image/*"} onChange={handleFileUpload} className="hidden" />
-                <Button variant="secondary" size="sm">
-                  Replace
-                </Button>
-              </label>
+              <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()}>
+                Replace
+              </Button>
             </div>
           )}
+
+          {/* Error Message */}
+          {processError && (
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-destructive/90 text-destructive-foreground px-4 py-2 rounded-lg text-sm">
+              {processError}
+            </div>
+          )}
+
+          {/* Server Status */}
+          <div className="absolute top-4 right-4 flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${serverStatus === "ok" ? "bg-green-500" : serverStatus === "error" ? "bg-red-500" : "bg-yellow-500"}`} />
+            <span className="text-xs text-muted-foreground">
+              {serverStatus === "ok" ? "Server Connected" : serverStatus === "error" ? "Server Offline" : "Checking..."}
+            </span>
+          </div>
 
           {/* Canvas for effects (hidden for now) */}
           <canvas ref={canvasRef} className="hidden" />
@@ -432,12 +521,9 @@ export default function BabyTrackPage() {
                 <div className="border-2 border-dashed border-muted-foreground/30 rounded-lg p-8 text-center">
                   <Upload className="w-8 h-8 mx-auto mb-2 opacity-50" />
                   <p className="text-sm">Upload {mediaType} to start</p>
-                  <label className="mt-2 cursor-pointer inline-block">
-                    <input type="file" accept={mediaType === "video" ? "video/*" : "image/*"} onChange={handleFileUpload} className="hidden" />
-                    <Button size="sm" className="mt-2">
-                      <Upload className="size-4 mr-2" /> Choose File
-                    </Button>
-                  </label>
+                  <Button size="sm" className="mt-2" onClick={() => fileInputRef.current?.click()}>
+                    <Upload className="size-4 mr-2" /> Choose File
+                  </Button>
                 </div>
               )}
             </div>
