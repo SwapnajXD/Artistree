@@ -139,15 +139,15 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
               </div>
             </div>
             <Button
-              variant="ghost"
+              variant="outline"
               size="icon"
               onClick={toggleTheme}
-              className="h-[24px] w-[24px] rounded-full border border-input bg-card shadow-xs hover:bg-accent hover:text-accent-foreground"
+              className="h-[28px] w-[28px] rounded-full border-2 border-primary/50 bg-gradient-to-br from-orange-500 to-amber-500 shadow-lg hover:from-orange-600 hover:to-amber-600"
             >
               {theme === "dark" ? (
-                <Sun className="h-3 w-3 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Sun className="h-4 w-4 text-black" />
               ) : (
-                <Moon className="absolute h-3 w-3 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <Moon className="h-4 w-4 text-black" />
               )}
               <span className="sr-only">Toggle theme</span>
             </Button>
@@ -204,7 +204,7 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
             ))}
           </div>
         </div>
-        <Button variant="ghost" className="w-full justify-start h-auto" asChild={false}>
+        <Button variant="ghost" className="w-full justify-start h-auto">
           <a href="#" className="flex items-center space-x-2 p-1 rounded-lg hover:bg-muted w-full justify-start">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
               <User className="h-4 w-4" />
@@ -224,7 +224,7 @@ export default function Home() {
     <div className="flex min-h-screen w-full">
       {/* Desktop Sidebar */}
       <div className="hidden md:flex">
-        <div className="flex h-svh w-[16rem] flex-col border-r">
+        <div className="sticky top-0 flex h-screen w-[16rem] flex-col border-r">
           <SidebarContent />
         </div>
       </div>
