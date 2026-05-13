@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   LayoutDashboard,
+  Info,
   Sun,
   Moon,
   Menu,
@@ -106,6 +107,10 @@ const navItems = [
   { name: "Explore", icon: LayoutDashboard, href: "#explore", active: true },
 ];
 
+const footerItems = [
+  { name: "About", icon: Info, href: "#about" },
+];
+
 function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
@@ -163,6 +168,19 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
       </div>
 
       <div className="flex flex-col gap-2 border-t p-2">
+        <nav className="flex w-full min-w-0 flex-col gap-1">
+          {footerItems.map((item) => (
+            <a
+              key={item.name}
+              href={item.href}
+              onClick={onItemClick}
+              className="flex w-full items-center gap-2 justify-start h-9 px-2 rounded-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            >
+              <item.icon className="size-6" />
+              <span>{item.name}</span>
+            </a>
+          ))}
+        </nav>
         <div className="flex items-center justify-between px-2 py-2">
           <div className="flex items-center space-x-3 text-sm text-muted-foreground">
             <span>Socials</span>
