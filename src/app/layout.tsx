@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
   title: "ARTISTREE - Creative Tools for Digital Art & Design",
@@ -17,15 +18,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
+    <html lang="en" className={cn("dark font-sans", geist.variable)}>
       <head>
         <link rel="preconnect" href="https://fonts.cdnfonts.com" />
         <link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
       </head>
       <body className="min-h-full">
-        <div className="noise-overlay" />
-        {children}
+        <TooltipProvider>
+          {children}
+        </TooltipProvider>
       </body>
     </html>
   );
