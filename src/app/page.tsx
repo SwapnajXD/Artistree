@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   LayoutDashboard,
@@ -157,11 +158,6 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
             >
               <item.icon className="size-6" />
               <span>{item.name}</span>
-              {item.soon && (
-                <span className="ml-auto inline-flex items-center rounded-full border bg-secondary px-2.5 py-0.5 text-xs font-semibold">
-                  Soon
-                </span>
-              )}
             </a>
           ))}
         </nav>
@@ -289,28 +285,23 @@ export default function Home() {
                           )}
                         </div>
                       </Link>
-                      <div className="flex-1 p-6">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-xl font-semibold text-foreground">{tool.name}</h3>
-                          <div className="flex flex-wrap gap-2">
-                            {tool.badges.map((badge) => (
-                              <span
-                                key={badge}
-                                className="inline-flex items-center rounded-full border bg-secondary px-2.5 py-0.5 text-xs font-semibold text-secondary-foreground"
-                              >
-                                {badge}
-                              </span>
-                            ))}
+                      <CardHeader>
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-xl">{tool.name}</CardTitle>
+                            <div className="flex flex-wrap gap-2">
+                              {tool.badges.map((badge) => (
+                                <Badge key={badge} variant="secondary">{badge}</Badge>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                        <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">{tool.description}</p>
-                      </div>
-                      <Link href={`/tools/${tool.id}`}>
-                        <div className="flex items-center justify-between border-t px-6 py-4 text-sm transition-all duration-300 hover:bg-muted/50">
-                          <span className="font-medium text-foreground">Try it now</span>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="line-clamp-2 text-sm text-muted-foreground">{tool.description}</p>
+                        </CardContent>
+                        <CardFooter className="flex items-center justify-between border-t">
+                          <span className="text-sm font-medium">Try it now</span>
                           <span className="transition-transform group-hover:translate-x-1">→</span>
-                        </div>
-                      </Link>
+                        </CardFooter>
                     </Card>
                   ))}
                 </div>
@@ -340,28 +331,23 @@ export default function Home() {
                           )}
                         </div>
                       </Link>
-                      <div className="flex-1 p-6">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-xl font-semibold text-foreground">{tool.name}</h3>
-                          <div className="flex flex-wrap gap-2">
-                            {tool.badges.map((badge) => (
-                              <span
-                                key={badge}
-                                className="inline-flex items-center rounded-full border bg-secondary px-2.5 py-0.5 text-xs font-semibold text-secondary-foreground"
-                              >
-                                {badge}
-                              </span>
-                            ))}
+                      <CardHeader>
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-xl">{tool.name}</CardTitle>
+                            <div className="flex flex-wrap gap-2">
+                              {tool.badges.map((badge) => (
+                                <Badge key={badge} variant="secondary">{badge}</Badge>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                        <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">{tool.description}</p>
-                      </div>
-                      <Link href={`/tools/${tool.id}`}>
-                        <div className="flex items-center justify-between border-t px-6 py-4 text-sm transition-all duration-300 hover:bg-muted/50">
-                          <span className="font-medium text-foreground">Try it now</span>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="line-clamp-2 text-sm text-muted-foreground">{tool.description}</p>
+                        </CardContent>
+                        <CardFooter className="flex items-center justify-between border-t">
+                          <span className="text-sm font-medium">Try it now</span>
                           <span className="transition-transform group-hover:translate-x-1">→</span>
-                        </div>
-                      </Link>
+                        </CardFooter>
                     </Card>
                   ))}
                 </div>
@@ -391,28 +377,23 @@ export default function Home() {
                           )}
                         </div>
                       </Link>
-                      <div className="flex-1 p-6">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-xl font-semibold text-foreground">{tool.name}</h3>
-                          <div className="flex flex-wrap gap-2">
-                            {tool.badges.map((badge) => (
-                              <span
-                                key={badge}
-                                className="inline-flex items-center rounded-full border bg-secondary px-2.5 py-0.5 text-xs font-semibold text-secondary-foreground"
-                              >
-                                {badge}
-                              </span>
-                            ))}
+                      <CardHeader>
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-xl">{tool.name}</CardTitle>
+                            <div className="flex flex-wrap gap-2">
+                              {tool.badges.map((badge) => (
+                                <Badge key={badge} variant="secondary">{badge}</Badge>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                        <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">{tool.description}</p>
-                      </div>
-                      <Link href={`/tools/${tool.id}`}>
-                        <div className="flex items-center justify-between border-t px-6 py-4 text-sm transition-all duration-300 hover:bg-muted/50">
-                          <span className="font-medium text-foreground">Try it now</span>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="line-clamp-2 text-sm text-muted-foreground">{tool.description}</p>
+                        </CardContent>
+                        <CardFooter className="flex items-center justify-between border-t">
+                          <span className="text-sm font-medium">Try it now</span>
                           <span className="transition-transform group-hover:translate-x-1">→</span>
-                        </div>
-                      </Link>
+                        </CardFooter>
                     </Card>
                   ))}
                 </div>
