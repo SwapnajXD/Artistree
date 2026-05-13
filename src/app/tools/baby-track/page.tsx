@@ -261,6 +261,7 @@ export default function BabyTrackPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processError, setProcessError] = useState<string | null>(null);
   const [serverStatus, setServerStatus] = useState<"checking" | "ok" | "error">("checking");
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -273,25 +274,23 @@ export default function BabyTrackPage() {
   }, []);
 
   const processMedia = async () => {
-    if (!mediaUrl || isProcessing) return;
-
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-    const file = fileInput?.files?.[0];
-    if (!file) return;
+    if (!uploadedFile || isProcessing) return;
 
     setIsProcessing(true);
     setProcessError(null);
 
     try {
+      console.log("Processing file:", uploadedFile.name, uploadedFile.type);
+
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", uploadedFile);
       formData.append("shape", shape);
       formData.append("region_style", regionStyle);
       formData.append("connection_rate", String(connectionRate));
       formData.append("stroke_width", String(strokeWidth));
       formData.append("blob_count", String(blobCount));
       formData.append("text_position", textPosition);
-      formData.append("font_size", parseInt(fontSize));
+      formData.append("font_size", String(parseInt(fontSize)));
       formData.append("filters", selectedFilters.join(","));
       formData.append("min_area", "100");
       formData.append("max_blobs", "500");
@@ -300,21 +299,27 @@ export default function BabyTrackPage() {
         ? "/api/tools/baby-track/process"
         : "/api/tools/baby-track/process-frame";
 
+      console.log("Sending to:", `${API_URL}${endpoint}`);
+
       const response = await fetch(`${API_URL}${endpoint}`, {
         method: "POST",
         body: formData,
       });
 
+      console.log("Response status:", response.status);
+
       if (!response.ok) {
-        throw new Error("Processing failed");
+        const errorText = await response.text();
+        throw new Error(`Processing failed: ${response.status} - ${errorText}`);
       }
 
       const blob = await response.blob();
+      console.log("Got blob:", blob.type, blob.size);
       const url = URL.createObjectURL(blob);
       setProcessedUrl(url);
     } catch (error) {
       console.error("Processing error:", error);
-      setProcessError("Failed to process. Make sure the server is running at localhost:8000");
+      setProcessError(error instanceof Error ? error.message : "Failed to process. Make sure the server is running at localhost:8000");
     } finally {
       setIsProcessing(false);
     }
@@ -325,6 +330,8 @@ export default function BabyTrackPage() {
     if (file) {
       const url = URL.createObjectURL(file);
       setMediaUrl(url);
+      setUploadedFile(file);
+      setProcessedUrl(null);
       setIsPlaying(false);
     }
   };
@@ -434,7 +441,7 @@ export default function BabyTrackPage() {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept={mediaType === "video" ? "video/*" : "image/*"}
+                accept="video/*,image/*"
                 onChange={handleFileUpload}
                 className="hidden"
               />

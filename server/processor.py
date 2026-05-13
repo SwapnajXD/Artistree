@@ -43,7 +43,7 @@ class BlobTracker:
         fgmask = self.fgbg.apply(frame)
 
         # Morphological operations to reduce noise
-        kernel = cv2.getStructuringElement(cv2.MORTH_ELLIPSE, (5, 5))
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
         fgmask = cv2.morphologyEx(fgmask, cv2.MORPH_OPEN, kernel, iterations=2)
 
         # Apply dilation to connect nearby blobs

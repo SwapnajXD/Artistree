@@ -107,12 +107,19 @@ async def process_video(
         max_blobs=max_blobs
     )
 
-    # Read video
+    # Read video - save to temp file for VideoCapture
     contents = await file.read()
-    nparr = np.frombuffer(contents, np.uint8)
-    video = cv2.VideoCapture(cv2.imdecode(nparr, cv2.IMREAD_COLOR))
+    import tempfile
+    import os
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+        tmp.write(contents)
+        tmp_path = tmp.name
+
+    video = cv2.VideoCapture(tmp_path)
 
     if not video.isOpened():
+        os.unlink(tmp_path)
         return {"error": "Failed to open video"}
 
     # Get video properties
@@ -146,6 +153,7 @@ async def process_video(
 
     video.release()
     output_writer.release()
+    os.unlink(tmp_path)
 
     # Return output file
     with open('output.mp4', 'rb') as f:
