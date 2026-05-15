@@ -134,15 +134,13 @@ async def process_video(
     # Create output buffer
     output_buffer = io.BytesIO()
 
-    # Video writer - use H264 codec if available, fallback to XVID
-    try:
-        fourcc = cv2.VideoWriter_fourcc(*'avc1')
-    except:
-        try:
-            fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        except:
-            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    # Video writer - use mp4v codec which is widely supported
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     output_writer = cv2.VideoWriter('output.mp4', fourcc, fps, (width, height))
+
+    if not output_writer.isOpened():
+        output_writer.release()
+        return {"error": "Failed to initialize video writer. No suitable codec available."}
 
     frame_count = 0
     while True:
@@ -161,9 +159,22 @@ async def process_video(
     output_writer.release()
     os.unlink(tmp_path)
 
+    # Convert to browser-compatible format using ffmpeg
+    import subprocess
+    subprocess.run([
+        'ffmpeg', '-y', '-i', 'output.mp4',
+        '-c:v', 'libx264', '-preset', 'fast',
+        '-crf', '23', '-movflags', '+faststart',
+        'output_compatible.mp4'
+    ], capture_output=True)
+
     # Return output file
-    with open('output.mp4', 'rb') as f:
+    with open('output_compatible.mp4', 'rb') as f:
         output_data = f.read()
+
+    # Cleanup temp files
+    os.unlink('output.mp4')
+    os.unlink('output_compatible.mp4')
 
     return StreamingResponse(
         io.BytesIO(output_data),

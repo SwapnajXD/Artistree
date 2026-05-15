@@ -39,7 +39,7 @@ class BlobTracker:
 
     def process_frame(self, frame: np.ndarray, settings: ProcessingSettings) -> np.ndarray:
         """Process a single frame and return annotated frame"""
-        # Apply background subtraction
+        # Try background subtraction first
         fgmask = self.fgbg.apply(frame)
 
         # Morphological operations to reduce noise
@@ -49,12 +49,35 @@ class BlobTracker:
         # Apply dilation to connect nearby blobs
         fgmask = cv2.dilate(fgmask, kernel, iterations=1)
 
-        # Find contours (blobs)
+        # Find contours (blobs) from background subtraction
         contours, _ = cv2.findContours(
             fgmask,
             cv2.RETR_EXTERNAL,
             cv2.CHAIN_APPROX_SIMPLE
         )
+
+        # If no contours found from background subtraction, try edge detection on the actual frame
+        if len(contours) < 5:
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            # Apply blur to reduce noise
+            gray = cv2.GaussianBlur(gray, (5, 5), 0)
+            # Edge detection
+            edges = cv2.Canny(gray, 50, 150)
+            # Dilate to connect edges into blobs
+            edges = cv2.dilate(edges, kernel, iterations=2)
+            # Find contours from edges
+            contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        # If still no contours, try color-based segmentation
+        if len(contours) < 5:
+            # Convert to HSV and find colored regions
+            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            # Use lower saturation mask to find non-gray areas
+            lower = np.array([0, 0, 50])
+            upper = np.array([180, 255, 255])
+            mask = cv2.inRange(hsv, lower, upper)
+            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=2)
+            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         # Filter by area
         valid_contours = [
@@ -64,6 +87,24 @@ class BlobTracker:
 
         # Sort by area (largest first) and limit
         valid_contours = sorted(valid_contours, key=cv2.contourArea, reverse=True)[:settings.max_blobs]
+
+        # If we still have no valid contours, create some based on grid pattern
+        if len(valid_contours) == 0:
+            h, w = frame.shape[:2]
+            grid_size = settings.blob_count
+            # Create grid-based "blobs"
+            rows = int(np.sqrt(grid_size * h / w))
+            cols = grid_size // rows
+            cell_h = h // rows
+            cell_w = w // cols
+            for i in range(rows):
+                for j in range(cols):
+                    cx = j * cell_w + cell_w // 2
+                    cy = i * cell_h + cell_h // 2
+                    size = min(cell_w, cell_h) // 3
+                    output = frame.copy()
+                    self._draw_shape(output, cx, cy, size, settings)
+                    return output
 
         # Draw shapes at blob centroids
         output = frame.copy()
