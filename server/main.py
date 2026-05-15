@@ -134,8 +134,14 @@ async def process_video(
     # Create output buffer
     output_buffer = io.BytesIO()
 
-    # Video writer
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    # Video writer - use H264 codec if available, fallback to XVID
+    try:
+        fourcc = cv2.VideoWriter_fourcc(*'avc1')
+    except:
+        try:
+            fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        except:
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     output_writer = cv2.VideoWriter('output.mp4', fourcc, fps, (width, height))
 
     frame_count = 0
@@ -205,6 +211,9 @@ async def process_frame_endpoint(
     contents = await file.read()
     nparr = np.frombuffer(contents, np.uint8)
     frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+    if frame is None:
+        return {"error": "Failed to decode image"}
 
     # Create tracker and process
     tracker = BlobTracker()

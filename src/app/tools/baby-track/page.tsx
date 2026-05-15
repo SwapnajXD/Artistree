@@ -304,9 +304,12 @@ export default function BabyTrackPage() {
       const response = await fetch(`${API_URL}${endpoint}`, {
         method: "POST",
         body: formData,
+      }).catch(err => {
+        console.error("Fetch error:", err);
+        throw err;
       });
 
-      console.log("Response status:", response.status);
+      console.log("Response status:", response.status, response.headers.get("content-type"));
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -315,7 +318,14 @@ export default function BabyTrackPage() {
 
       const blob = await response.blob();
       console.log("Got blob:", blob.type, blob.size);
-      const url = URL.createObjectURL(blob);
+
+      // Determine correct MIME type
+      let mimeType = blob.type;
+      if (!mimeType || mimeType === "application/octet-stream") {
+        mimeType = mediaType === "video" ? "video/mp4" : "image/jpeg";
+      }
+
+      const url = URL.createObjectURL(new Blob([blob], { type: mimeType }));
       setProcessedUrl(url);
     } catch (error) {
       console.error("Processing error:", error);
@@ -409,6 +419,7 @@ export default function BabyTrackPage() {
                 playsInline
                 controls
                 autoPlay
+                onError={(e) => console.error("Video error:", e.currentTarget.error)}
               />
             ) : (
               <img
